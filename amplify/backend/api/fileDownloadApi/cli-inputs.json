@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "paths": {
+    "/download": {
+      "name": "/download",
+      "lambdaFunction": "generateDownloadLink",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create"
+        ]
+      }
+    },
+    "/verify": {
+      "name": "/verify",
+      "lambdaFunction": "verifyDownload",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Your Color Palette</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+    <h1 class="text-2xl font-bold mb-4" id="title">Your Color Palette</h1>
+    <p class="mb-6" id="description">Click the button below to download your file.</p>
+    
+    <button id="downloadBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-md transition-colors font-medium">
+      Download Now
+    </button>
+    
+    <p class="text-gray-500 text-sm mt-4">This download is available only once for security reasons.</p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      const downloadId = params.get('id');
+      
+      if (!downloadId) {
+        document.getElementById('title').textContent = 'Invalid Download Link';
+        document.getElementById('description').textContent = 'This download link is invalid or has expired.';
+        document.getElementById('downloadBtn').style.display = 'none';
+        return;
+      }
+      
+      const storageKey = `palette_download_${downloadId}`;
+      const downloadDataStr = localStorage.getItem(storageKey);
+      
+      if (!downloadDataStr) {
+        document.getElementById('title').textContent = 'Download Expired';
+        document.getElementById('description').textContent = 'This download link has expired or already been used.';
+        document.getElementById('downloadBtn').style.display = 'none';
+        return;
+      }
+      
+      const downloadData = JSON.parse(downloadDataStr);
+      
+      // Debug information
+      console.log("Raw localStorage data:", downloadDataStr);
+      console.log("Parsed downloadData:", downloadData);
+      console.log("Content length:", downloadData.content ? downloadData.content.length : 0);
+      
+      document.getElementById('title').textContent = `Your ${downloadData.format.toUpperCase()} Color Palette`;
+      document.getElementById('description').textContent = `Your ${downloadData.format.toUpperCase()} file is ready to download.`;
+      
+      document.getElementById('downloadBtn').addEventListener('click', function() {
+        try {
+          // Log the raw data for debugging
+          console.log("Downloaded data:", downloadData);
+          
+          // Use the content directly
+          const content = downloadData.content;
+          
+          if (!content) {
+            throw new Error("Content is empty");
+          }
+          
+          // Create blob with the correct type and encoding
+          let blob;
+          
+          // Handle different content types
+          if (downloadData.format === 'json' || downloadData.format === 'figma') {
+            // For JSON, we need to ensure it's properly formatted
+            blob = new Blob([content], { type: 'application/json' });
+          } else if (downloadData.format === 'css') {
+            blob = new Blob([content], { type: 'text/css' });
+          } else if (downloadData.format === 'scss') {
+            blob = new Blob([content], { type: 'text/scss' });
+          } else {
+            // Default fallback
+            blob = new Blob([content], { type: downloadData.contentType });
+          }
+          
+          // Create the download
+          const element = document.createElement('a');
+          element.href = URL.createObjectURL(blob);
+          element.download = downloadData.filename;
+          document.body.appendChild(element);
+          element.click();
+          document.body.removeChild(element);
+          
+          // Remove from storage after download
+          localStorage.removeItem(storageKey);
+          
+          // Update UI
+          document.getElementById('title').textContent = 'Download Complete!';
+          document.getElementById('description').textContent = 'Your file has been downloaded successfully.';
+          document.getElementById('downloadBtn').style.display = 'none';
+        } catch (error) {
+          console.error("Download error:", error);
+          document.getElementById('title').textContent = 'Download Error';
+          document.getElementById('description').textContent = 'There was an error processing your download. Please try again.';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

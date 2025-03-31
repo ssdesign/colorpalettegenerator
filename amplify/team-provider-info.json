@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-colorpalettegenerato-dev-220957-authRole",
+      "UnauthRoleArn": "arn:aws:iam::587787519212:role/amplify-colorpalettegenerato-dev-220957-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::587787519212:role/amplify-colorpalettegenerato-dev-220957-authRole",
+      "Region": "us-west-1",
+      "DeploymentBucketName": "amplify-colorpalettegenerato-dev-220957-deployment",
+      "UnauthRoleName": "amplify-colorpalettegenerato-dev-220957-unauthRole",
+      "StackName": "amplify-colorpalettegenerato-dev-220957",
+      "StackId": "arn:aws:cloudformation:us-west-1:587787519212:stack/amplify-colorpalettegenerato-dev-220957/6485c030-0dee-11f0-a918-0251219904bb",
+      "AmplifyAppId": "d2vsfokipxpsbb"
+    },
+    "categories": {
+      "auth": {
+        "undefined": {}
+      }
+    }
+  }
+}

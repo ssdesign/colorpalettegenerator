@@ -9,13 +9,15 @@ interface RightPanelProps {
   onChartTypeChange: (type: 'bar' | 'line' | 'stackedBar' | 'pie') => void;
   getCurrentPalette: () => any;
   getCurrentBackground: () => string;
+  onOpenExportModal: (format: 'json' | 'css' | 'scss' | 'figma') => void;
 }
 
 export const RightPanel: React.FC<RightPanelProps> = ({
   state,
   onChartTypeChange,
   getCurrentPalette,
-  getCurrentBackground
+  getCurrentBackground,
+  onOpenExportModal
 }) => {
   const currentBackground = getCurrentBackground();
   const isDarkMode = chroma(currentBackground).get('lab.l') < 50;
@@ -75,6 +77,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
             textColor={textColor}
             inactiveTextColor={inactiveTextColor}
             borderColor={borderColor}
+            onOpenExportModal={onOpenExportModal}
           />
         </div>
       </div>

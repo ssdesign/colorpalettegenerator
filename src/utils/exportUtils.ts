@@ -171,12 +171,14 @@ export const exportPalettes = (
   palettes: Palette[], 
   tokenPrefix: string, 
   format: 'json' | 'css' | 'scss' | 'figma',
-  mode: 'light' | 'dark' = 'light'
-): void => {
+  mode: 'light' | 'dark',
+  triggerDownload = true
+) => {
   let content = '';
   let fileName = '';
   let contentType = 'text/plain';
   
+  // Generate content based on format
   switch (format) {
     case 'json':
       content = exportAsJSON(palettes, tokenPrefix);
@@ -200,5 +202,21 @@ export const exportPalettes = (
       break;
   }
   
+  // If triggerDownload is false, just return the content
+  if (!triggerDownload) {
+    return {
+      content,
+      filename: fileName,
+      contentType
+    };
+  }
+  
+  // Otherwise, trigger the download
   downloadFile(content, fileName, contentType);
+  
+  return {
+    content,
+    filename: fileName,
+    contentType
+  };
 }; 
