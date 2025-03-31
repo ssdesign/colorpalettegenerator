@@ -87,16 +87,18 @@ export const Layout: React.FC<LayoutProps> = ({
       // Create a unique download ID
       const downloadId = Math.random().toString(36).substring(2, 15);
       
-      // Store raw content directly without encoding
-      localStorage.setItem(`palette_download_${downloadId}`, JSON.stringify({
-        content: content,
-        filename,
-        contentType,
-        format: exportFormat
-      }));
+      // Store content in localStorage (only in browser environment)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`palette_download_${downloadId}`, JSON.stringify({
+          content: content,
+          filename,
+          contentType,
+          format: exportFormat
+        }));
+      }
       
       // Generate download URL
-      const downloadUrl = `${window.location.origin}/download.html?id=${downloadId}`;
+      const downloadUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/download.html?id=${downloadId}`;
       
       // Send email using EmailJS
       const templateParams = {
