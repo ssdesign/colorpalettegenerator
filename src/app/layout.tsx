@@ -7,6 +7,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "WCAG-Accessible Color Palette Generator",
   description: "Generate accessible color palettes for data visualization in both light and dark modes.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png"
+  }
 };
 
 export default function RootLayout({
