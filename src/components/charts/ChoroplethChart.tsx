@@ -9,12 +9,14 @@ interface ChoroplethChartProps {
   backgroundColor: string;
 }
 
+// Define proper types for TopoJSON structure
 interface GeometryObject {
   type: string;
   geometries: Array<{
     type: string;
     id: string;
     properties: { [key: string]: any };
+    arcs: number[][];
   }>;
 }
 
@@ -31,7 +33,7 @@ interface Topology {
   };
 }
 
-type CountyFeature = Feature<Geometry, GeoJsonProperties> & { id: string };
+type CountyFeature = Feature<Geometry, { id: string }>;
 
 const ChoroplethChart: React.FC<ChoroplethChartProps> = ({ colorHexes, backgroundColor }) => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -44,13 +46,14 @@ const ChoroplethChart: React.FC<ChoroplethChartProps> = ({ colorHexes, backgroun
         const response = await fetch(
           "https://cdn.jsdelivr.net/npm/us-atlas@3/counties-albers-10m.json"
         );
-        const topology = await response.json() as Topology;
+        const topology = await response.json();
 
         if (!topology || !svgRef.current) return;
 
         // Generate random data for counties
         const counties = new Map<string, number>();
-        topology.objects.counties.geometries.forEach(d => {
+        const geometries = (topology.objects.counties.geometries as Array<{ id: string }>);
+        geometries.forEach(d => {
           counties.set(d.id, Math.random() * 10);
         });
 
@@ -77,12 +80,12 @@ const ChoroplethChart: React.FC<ChoroplethChartProps> = ({ colorHexes, backgroun
         const path = d3.geoPath();
 
         // Draw counties
-        const countyFeatures = topojson.feature(topology as any, topology.objects.counties) as unknown as FeatureCollection<Geometry, GeoJsonProperties>;
+        const countyFeatures = (topojson.feature(topology, topology.objects.counties) as unknown) as FeatureCollection<Geometry, { id: string }>;
         svg.append("g")
           .selectAll("path")
           .data(countyFeatures.features)
           .join("path")
-          .attr("fill", (d: CountyFeature) => {
+          .attr("fill", (d: any) => {
             const value = counties.get(d.id);
             return value !== undefined ? color(value / 10).hex() : backgroundColor;
           })
@@ -91,7 +94,7 @@ const ChoroplethChart: React.FC<ChoroplethChartProps> = ({ colorHexes, backgroun
           .attr("stroke-width", 0.25);
 
         // Draw state borders
-        const stateBorders = topojson.mesh(topology as any, topology.objects.states, (a, b) => a !== b);
+        const stateBorders = topojson.mesh(topology, topology.objects.states, (a, b) => a !== b);
         svg.append("path")
           .datum(stateBorders)
           .attr("fill", "none")

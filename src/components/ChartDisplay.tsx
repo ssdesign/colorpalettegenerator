@@ -1,9 +1,13 @@
 import React, { useCallback } from 'react';
 import { Palette, ChartType } from '../types';
 import BarChart from './charts/BarChart';
+import BarChartD3 from './charts/BarChartD3';
 import LineChart from './charts/LineChart';
+import LineChartD3 from './charts/LineChartD3';
 import PieChart from './charts/PieChart';
+import PieChartD3 from './charts/PieChartD3';
 import StackedBarChart from './charts/StackedBarChart';
+import StackedBarChartD3 from './charts/StackedBarChartD3';
 import ChoroplethChart from './charts/ChoroplethChart';
 import HeatmapChart from './charts/HeatmapChart';
 import DensityChart from './charts/DensityChart';
@@ -52,13 +56,13 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
   const renderChart = () => {
     switch(chartType) {
       case 'bar':
-        return <BarChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+        return <BarChartD3 colorHexes={colorHexes} backgroundColor={currentBackground} />;
       case 'line':
-        return <LineChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+        return <LineChartD3 colorHexes={colorHexes} backgroundColor={currentBackground} />;
       case 'pie':
-        return <PieChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+        return <PieChartD3 colorHexes={colorHexes} backgroundColor={currentBackground} />;
       case 'stackedBar':
-        return <StackedBarChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+        return <StackedBarChartD3 colorHexes={colorHexes} backgroundColor={currentBackground} />;
       case 'choropleth':
         return <ChoroplethChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
       case 'heatmap':

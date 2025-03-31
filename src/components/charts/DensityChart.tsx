@@ -130,7 +130,7 @@ const DensityChart: React.FC<DensityChartProps> = ({ colorHexes, backgroundColor
     svg.append("path")
       .datum(allDensity)
       .attr("fill", colorHexes[1])
-      .attr("fill-opacity", 0.8)
+      .attr("fill-opacity", 0.4)
       .attr("stroke", "none")
       .attr("d", d3.line()
         .curve(d3.curveBasis)
@@ -147,7 +147,7 @@ const DensityChart: React.FC<DensityChartProps> = ({ colorHexes, backgroundColor
       .attr("width", d => x(d.x1 || 0) - x(d.x0 || 0))
       .attr("height", d => height - yHistogram(d.length))
       .attr("fill", (d, i) => gradientColor(i / bins.length).hex())
-      .attr("fill-opacity", 0.6)
+      .attr("fill-opacity", 0.8)
       .attr("stroke", isDarkMode ? "#444444" : "#DDDDDD")
       .attr("stroke-width", 1);
 
