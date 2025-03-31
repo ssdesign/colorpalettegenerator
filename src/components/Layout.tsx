@@ -100,7 +100,7 @@ export const Layout: React.FC<LayoutProps> = ({
           <div className="flex gap-4 text-sm py-2">
             <a href="#" className="hover:underline">Privacy</a>
             <span>|</span>
-            <a href="#" className="hover:underline">Terms</a>
+            <a href="#" className="hover:underline">Terms and</a>
             <span>|</span>
             <a href="#" className="hover:underline">Contact</a>
           </div>
