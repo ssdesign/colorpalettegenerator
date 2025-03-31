@@ -74,7 +74,7 @@ const DensityChart: React.FC<DensityChartProps> = ({ colorHexes, backgroundColor
 
     // Create histogram
     const histogram = d3.histogram<number, number>()
-      .domain(x.domain())
+      .domain(x.domain() as [number, number])
       .thresholds(x.ticks(30));
 
     const bins = histogram(data);
@@ -109,7 +109,7 @@ const DensityChart: React.FC<DensityChartProps> = ({ colorHexes, backgroundColor
       .attr("d", d3.line()
         .curve(d3.curveBasis)
         .x(d => x(d[0]))
-        .y(d => y(d[1]))
+        .y(d => y(d[1])) as any
       );
 
     // Mirror the violin plot
@@ -122,7 +122,7 @@ const DensityChart: React.FC<DensityChartProps> = ({ colorHexes, backgroundColor
       .attr("d", d3.line()
         .curve(d3.curveBasis)
         .x(d => x(d[0]))
-        .y(d => y(-d[1]))
+        .y(d => y(-d[1])) as any
       );
 
     // Fill the violin
@@ -135,7 +135,7 @@ const DensityChart: React.FC<DensityChartProps> = ({ colorHexes, backgroundColor
       .attr("d", d3.line()
         .curve(d3.curveBasis)
         .x(d => x(d[0]))
-        .y(d => y(d[1]))
+        .y(d => y(d[1])) as any
       );
 
     // Add histogram bars
