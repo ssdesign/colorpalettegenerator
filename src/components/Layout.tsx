@@ -3,7 +3,7 @@ import { DynamicLogo } from './DynamicLogo';
 import { Header } from './Header';
 import { LeftPanel } from './LeftPanel';
 import { RightPanel } from './RightPanel';
-import { AppState, StrictnessLevel } from '../types';
+import { AppState, StrictnessLevel, ChartType } from '../types';
 import EmailModal from './EmailModal';
 import { exportPalettes } from '../utils/exportUtils';
 import emailjs from 'emailjs-com';
@@ -11,7 +11,7 @@ import emailjs from 'emailjs-com';
 interface LayoutProps {
   state: AppState;
   onPaletteTypeChange: (type: 'categorical' | 'sequential' | 'diverging') => void;
-  onChartTypeChange: (type: 'bar' | 'line' | 'stackedBar' | 'pie') => void;
+  onChartTypeChange: (type: ChartType) => void;
   onEditPaletteName: (id: string, name: string) => void;
   onEditColorName: (id: string, index: number, name: string) => void;
   onEditColorHex: (id: string, index: number, hex: string, mode: 'light' | 'dark') => void;
