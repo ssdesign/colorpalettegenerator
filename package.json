@@ -1,0 +1,37 @@
+{
+  "name": "color-palette-generator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@heroicons/react": "^2.2.0",
+    "@types/uuid": "^10.0.0",
+    "chroma-js": "^3.1.2",
+    "culori": "^4.0.1",
+    "d3-scale": "^4.0.2",
+    "next": "15.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/chroma-js": "^3.1.1",
+    "@types/d3-scale": "^4.0.9",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
+  }
+}
