@@ -5,7 +5,8 @@ import {
   Pie,
   Cell,
   Tooltip,
-  Legend
+  Legend,
+  Sector
 } from 'recharts';
 import chroma from 'chroma-js';
 
@@ -17,7 +18,7 @@ interface PieChartProps {
 // Generate random data for the chart
 const generateData = (numPieces: number) => {
   const data = [];
-  const labels = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta'];
+  const labels = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta'];
   
   for (let i = 0; i < Math.min(numPieces, labels.length); i++) {
     data.push({
@@ -27,6 +28,39 @@ const generateData = (numPieces: number) => {
   }
   
   return data;
+};
+
+// Custom label renderer that keeps labels inside the chart area
+const renderCustomizedLabel = (props: any) => {
+  const { cx, cy, midAngle, innerRadius, outerRadius, percent, index, name, fill } = props;
+  
+  // Calculate the position of the label
+  const RADIAN = Math.PI / 180;
+  // Use a smaller radius to keep labels closer to the pie
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  
+  // Only show percentage for significant slices (more than 5%)
+  if (percent < 0.05) return null;
+  
+  // Calculate the luminance of the fill color to determine if we should use white or black text
+  const luminance = chroma(fill).luminance();
+  const textColor = luminance > 0.5 ? '#000000' : '#FFFFFF';
+  
+  return (
+    <text 
+      x={x} 
+      y={y} 
+      fill={textColor}
+      textAnchor="middle" 
+      dominantBaseline="central"
+      fontSize={12}
+      fontWeight="bold"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
 };
 
 const PieChart: React.FC<PieChartProps> = ({ colorHexes, backgroundColor }) => {
@@ -49,7 +83,7 @@ const PieChart: React.FC<PieChartProps> = ({ colorHexes, backgroundColor }) => {
   };
 
   return (
-    <div className="w-full h-64 rounded-lg p-4">
+    <div className="w-full h-64 rounded-lg">
       <ResponsiveContainer width="100%" height="100%">
         <RechartsPieChart>
           <Pie
@@ -57,13 +91,22 @@ const PieChart: React.FC<PieChartProps> = ({ colorHexes, backgroundColor }) => {
             cx="50%"
             cy="50%"
             labelLine={false}
-            outerRadius={80}
+            // Reduce outer radius to leave more space
+            outerRadius={65}
+            // Add inner radius for a donut chart look which helps with label space
+            innerRadius={30}
             fill="#8884d8"
             dataKey="value"
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            // Use custom label renderer
+            label={renderCustomizedLabel}
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+              <Cell 
+                key={`cell-${index}`} 
+                fill={colors[index % colors.length]} 
+                stroke={backgroundColor}
+                strokeWidth={1}
+              />
             ))}
           </Pie>
           <Tooltip
@@ -74,7 +117,12 @@ const PieChart: React.FC<PieChartProps> = ({ colorHexes, backgroundColor }) => {
             }}
             labelStyle={{ color: textColor }}
           />
-          <Legend formatter={renderColorfulLegendText} />
+          <Legend 
+            formatter={renderColorfulLegendText}
+            layout="horizontal"
+            verticalAlign="bottom"
+            align="center"
+          />
         </RechartsPieChart>
       </ResponsiveContainer>
     </div>

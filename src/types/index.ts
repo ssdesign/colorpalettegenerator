@@ -37,7 +37,15 @@ export interface Palette {
 
 export type StrictnessLevel = 'AALarge' | 'AASmall' | 'AAALarge' | 'AAASmall';
 
-export type ChartType = 'bar' | 'line' | 'stackedBar' | 'pie' | 'scatter';
+export type ChartType = 
+  | 'bar' 
+  | 'line' 
+  | 'stackedBar' 
+  | 'pie' 
+  | 'scatter'
+  | 'choropleth'
+  | 'heatmap'
+  | 'density';
 
 export interface TokenSettings {
   prefix: string;

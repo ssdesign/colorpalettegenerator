@@ -3,6 +3,10 @@ import { Palette, ChartType } from '../types';
 import BarChart from './charts/BarChart';
 import LineChart from './charts/LineChart';
 import PieChart from './charts/PieChart';
+import StackedBarChart from './charts/StackedBarChart';
+import ChoroplethChart from './charts/ChoroplethChart';
+import HeatmapChart from './charts/HeatmapChart';
+import DensityChart from './charts/DensityChart';
 
 interface ChartDisplayProps {
   chartType: ChartType;
@@ -54,11 +58,13 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
       case 'pie':
         return <PieChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
       case 'stackedBar':
-        // We'll treat stacked bar the same as regular bar for now
-        return <BarChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
-      case 'scatter':
-        // We'll treat scatter the same as line for now
-        return <LineChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+        return <StackedBarChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+      case 'choropleth':
+        return <ChoroplethChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+      case 'heatmap':
+        return <HeatmapChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
+      case 'density':
+        return <DensityChart colorHexes={colorHexes} backgroundColor={currentBackground} />;
       default:
         return <div>Select a chart type</div>;
     }

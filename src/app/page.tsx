@@ -50,8 +50,7 @@ export default function Home() {
 
   // Get current palette for chart display
   const getCurrentPalette = () => {
-    // Always use categorical palette for all chart types
-    return state.palettes.find(palette => palette.type === 'categorical') || state.palettes[0];
+    return state.palettes.find(palette => palette.type === state.selectedPaletteType) || state.palettes[0];
   };
 
   return (
