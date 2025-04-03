@@ -99,7 +99,7 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
             height={16} 
             style={imageStyle}
           />
-          <span>Figma</span>
+          <span>Figma JSON</span>
         </button>
       </div>
     </div>

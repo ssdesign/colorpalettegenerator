@@ -59,7 +59,7 @@ export const RightPanel: React.FC<RightPanelProps> = ({
   }, [state.selectedPaletteType, chartOptions, state.selectedChartType, onChartTypeChange]);
 
   return (
-    <div className="w-[35%] flex flex-col h-full pr-24">
+    <div className="w-[40%] flex flex-col h-full pr-24">
       <div className="container mx-auto px-6 py-4 border-b flex-shrink-0" style={{ borderColor }}>
         <div className="flex gap-8 py-3">
           {chartOptions.map((chart) => (

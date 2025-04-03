@@ -76,11 +76,11 @@ const ChartDisplay: React.FC<ChartDisplayProps> = ({
 
   return (
     <div 
-      className="rounded-lg border p-4 mb-6 shadow-sm"
+      className="rounded-lg border p-4 mb-6 shadow-sm h-full"
       style={chartContainerStyle}
     >
       <h2 className="text-xl font-semibold mb-4">Chart Preview</h2>
-      <div className="h-64">
+      <div className="h-[calc(100%-2rem)]">
         {renderChart()}
       </div>
     </div>

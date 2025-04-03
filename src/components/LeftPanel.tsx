@@ -34,7 +34,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   const activeColor = isDarkMode ? '#60A5FA' : '#0066FF';
 
   return (
-    <div className="w-[65%] border-r flex flex-col h-full pl-24" style={{ borderColor }}>
+    <div className="w-[60%] border-r flex flex-col h-full pl-24" style={{ borderColor }}>
       <div className="container mx-auto px-6 py-4 border-b flex-shrink-0" style={{ borderColor }}>
         <div className="flex justify-between items-center py-3">
           <div className="flex gap-8">

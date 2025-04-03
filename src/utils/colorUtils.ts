@@ -242,6 +242,142 @@ export const isColorTooSimilar = (
   return result;
 };
 
+// Calculate centroid of points in LAB space
+const calculateCentroid = (points: number[][]): number[] => {
+  const sum = points.reduce((acc, point) => [
+    acc[0] + point[0],
+    acc[1] + point[1],
+    acc[2] + point[2]
+  ], [0, 0, 0]);
+  
+  return sum.map(v => v / points.length);
+};
+
+// Generate perceptually distinct colors using K-means clustering
+const generatePerceptuallyDistinctColors = (count: number): string[] => {
+  // Generate a large pool of candidate colors
+  const candidateCount = count * 20; // Generate 20x more colors than needed
+  const candidates: number[][] = []; // Store colors in LAB space
+  
+  // Generate candidates with good spread in LAB space
+  for (let i = 0; i < candidateCount; i++) {
+    const hue = (i * 137.508) % 360; // Use golden angle for even hue distribution
+    const saturation = 0.75 + (Math.random() * 0.15); // 0.75-0.90
+    const lightness = 0.45 + (Math.random() * 0.15);  // 0.45-0.60
+    const lab = chroma.hsl(hue, saturation, lightness).lab();
+    candidates.push([lab[0], lab[1], lab[2]]);
+  }
+  
+  // Initialize cluster centers randomly from candidates
+  let centers: number[][] = [];
+  const usedIndices = new Set<number>();
+  
+  while (centers.length < count) {
+    const index = Math.floor(Math.random() * candidates.length);
+    if (!usedIndices.has(index)) {
+      usedIndices.add(index);
+      centers.push([...candidates[index]]);
+    }
+  }
+  
+  // K-means clustering
+  const maxIterations = 50;
+  let iterations = 0;
+  let changed = true;
+  
+  while (changed && iterations < maxIterations) {
+    changed = false;
+    iterations++;
+    
+    // Assign points to nearest center
+    const clusters: number[][][] = Array(count).fill(null).map(() => []);
+    
+    candidates.forEach(point => {
+      let minDist = Infinity;
+      let nearestCenter = 0;
+      
+      centers.forEach((center, i) => {
+        const dist = Math.sqrt(
+          Math.pow(point[0] - center[0], 2) +
+          Math.pow(point[1] - center[1], 2) +
+          Math.pow(point[2] - center[2], 2)
+        );
+        if (dist < minDist) {
+          minDist = dist;
+          nearestCenter = i;
+        }
+      });
+      
+      clusters[nearestCenter].push(point);
+    });
+    
+    // Update centers
+    const newCenters = clusters.map((cluster, i) => {
+      if (cluster.length === 0) return centers[i];
+      return calculateCentroid(cluster);
+    });
+    
+    // Check if centers changed significantly
+    centers.forEach((center, i) => {
+      const diff = Math.sqrt(
+        Math.pow(center[0] - newCenters[i][0], 2) +
+        Math.pow(center[1] - newCenters[i][1], 2) +
+        Math.pow(center[2] - newCenters[i][2], 2)
+      );
+      if (diff > 0.1) changed = true;
+    });
+    
+    centers = newCenters;
+  }
+  
+  // Convert LAB centers back to hex colors
+  let colors = centers.map(center => 
+    chroma.lab(center[0], center[1], center[2]).hex()
+  );
+  
+  // Optimize color order using nearest neighbor algorithm
+  const optimizeOrder = (colors: string[]): string[] => {
+    const result: string[] = [colors[0]];
+    const remaining = new Set(colors.slice(1));
+    
+    while (remaining.size > 0) {
+      const lastColor = result[result.length - 1];
+      let maxDistance = -Infinity;
+      let furthestColor = '';
+      
+      // Find the color that's furthest from both the last color and all other remaining colors
+      for (const candidate of remaining) {
+        const distToLast = chroma.distance(lastColor, candidate, 'lab');
+        
+        // Calculate minimum distance to all other remaining colors
+        let minDistToOthers = Infinity;
+        for (const other of remaining) {
+          if (other !== candidate) {
+            const dist = chroma.distance(candidate, other, 'lab');
+            minDistToOthers = Math.min(minDistToOthers, dist);
+          }
+        }
+        
+        // Use a weighted combination of both distances
+        const combinedDistance = distToLast * 0.7 + minDistToOthers * 0.3;
+        
+        if (combinedDistance > maxDistance) {
+          maxDistance = combinedDistance;
+          furthestColor = candidate;
+        }
+      }
+      
+      result.push(furthestColor);
+      remaining.delete(furthestColor);
+    }
+    
+    return result;
+  };
+  
+  // Return optimized color order
+  return optimizeOrder(colors);
+};
+
 // Generate a categorical palette with 12 distinct colors
 export const generateCategoricalPalette = (
   baseColor: string,
@@ -249,134 +385,33 @@ export const generateCategoricalPalette = (
   darkBackground: string,
   strictnessLevel: StrictnessLevel
 ): Color[] => {
-  // Initial pool of potential colors inspired by IBM, Google Material, and other design systems
-  const potentialColors = [
-    '#0F62FE', // IBM Blue 60
-    '#DA1E28', // IBM Red 60
-    '#198038', // IBM Green 60
-    '#8A3FFC', // IBM Purple 60
-    '#FF832B', // IBM Orange 40
-    '#009D9A', // IBM Teal 50
-    '#A56EFF', // IBM Purple 40
-    '#FFAB00', // Amber 700
-    '#6200EA', // Deep Purple A700
-    '#00B8D4', // Cyan A700
-    '#64DD17', // Light Green A700
-    '#304FFE', // Indigo A700
-    '#F44336', // Material Red 500
-    '#2196F3', // Material Blue 500
-    '#4CAF50', // Material Green 500
-    '#FF9800', // Material Orange 500
-    '#9C27B0', // Material Purple 500
-    '#00BCD4', // Material Cyan 500
-    '#CDDC39', // Material Lime 500
-    '#795548', // Material Brown 500
-    '#607D8B', // Material Blue Grey 500
-    '#E91E63', // Material Pink 500
-    '#673AB7', // Material Deep Purple 500
-    '#8D6E63'  // Material Brown 400
-  ];
+  // Generate perceptually distinct base colors
+  const baseColors = generatePerceptuallyDistinctColors(12);
   
-  // Shuffle the array to get a random order
-  const shuffledColors = [...potentialColors].sort(() => Math.random() - 0.5);
-  
-  // Use the same distance threshold as used in color similarity checks
-  const MIN_DISTANCE = MIN_PERCEPTUAL_DISTANCE;
-  
-  // Algorithm to select colors with sufficient perceptual distance
-  const selectedColors: string[] = [];
-  
-  // Always start with a random color
-  selectedColors.push(shuffledColors[0]);
-  
-  // Introduce some randomness by slightly varying the base color
-  const baseHsl = chroma(baseColor).hsl();
-  const variedBaseColor = chroma.hsl(
-    (baseHsl[0] + Math.random() * 30) % 360,  // Random hue shift
-    Math.min(1, Math.max(0.5, baseHsl[1] + (Math.random() * 0.3 - 0.15))), // Random saturation adjustment
-    Math.min(0.9, Math.max(0.3, baseHsl[2] + (Math.random() * 0.3 - 0.15)))  // Random lightness adjustment
-  ).hex();
-  
-  selectedColors.push(variedBaseColor);
-  
-  // Select the rest of the colors from shuffled array
-  for (let i = 1; i < shuffledColors.length && selectedColors.length < 12; i++) {
-    const candidateColor = shuffledColors[i];
-    let isTooSimilar = false;
+  // Create color objects with light and dark variants
+  const colors: Color[] = baseColors.map((baseColor, i) => {
+    // Get target contrast for the strictness level
+    const targetContrast = getTargetContrastForLevel(strictnessLevel);
     
-    // Check against all previously selected colors
-    for (const selectedColor of selectedColors) {
-      const distance = calculateColorDistance(candidateColor, selectedColor);
-      console.log(`Generation - comparing ${candidateColor} with ${selectedColor}: distance = ${distance.toFixed(2)}, threshold = ${MIN_DISTANCE}`);
-      
-      if (distance < MIN_DISTANCE) {
-        isTooSimilar = true;
-        console.log(`Generation - rejected ${candidateColor}: too similar to ${selectedColor}`);
-        break;
+    // Optimize colors for light and dark backgrounds
+    const lightModeColor = optimizeColorForBackground(baseColor, lightBackground, targetContrast);
+    const darkModeColor = optimizeColorForBackground(baseColor, darkBackground, targetContrast);
+    
+    return {
+      name: `Color ${i + 1}`,
+      token: `color.${i}`,
+      light: {
+        hex: lightModeColor,
+        contrastRatio: calculateContrastRatio(lightModeColor, lightBackground),
+        wcagCompliance: checkWCAGCompliance(lightModeColor, lightBackground)
+      },
+      dark: {
+        hex: darkModeColor,
+        contrastRatio: calculateContrastRatio(darkModeColor, darkBackground),
+        wcagCompliance: checkWCAGCompliance(darkModeColor, darkBackground)
       }
-    }
-    
-    // Add the color if it's not too similar
-    if (!isTooSimilar) {
-      console.log(`Generation - accepted ${candidateColor}`);
-      selectedColors.push(candidateColor);
-    }
-  }
-  
-  // If we don't have enough colors, we'll modify some colors to increase the distance
-  while (selectedColors.length < 12) {
-    // Generate a random color with reasonable saturation and lightness
-    const hue = Math.floor(Math.random() * 360);
-    const saturation = 0.6 + Math.random() * 0.3; // Between 0.6 and 0.9
-    const lightness = 0.4 + Math.random() * 0.2;  // Between 0.4 and 0.6
-    
-    const candidateColor = chroma.hsl(hue, saturation, lightness).hex();
-    console.log(`Generation (fallback) - trying random color ${candidateColor}`);
-    
-    let isTooSimilar = false;
-    for (const selectedColor of selectedColors) {
-      const distance = calculateColorDistance(candidateColor, selectedColor);
-      console.log(`Generation (fallback) - comparing ${candidateColor} with ${selectedColor}: distance = ${distance.toFixed(2)}, threshold = ${MIN_DISTANCE}`);
-      
-      if (distance < MIN_DISTANCE) {
-        isTooSimilar = true;
-        console.log(`Generation (fallback) - rejected ${candidateColor}: too similar to ${selectedColor}`);
-        break;
-      }
-    }
-    
-    if (!isTooSimilar) {
-      console.log(`Generation (fallback) - accepted ${candidateColor}`);
-      selectedColors.push(candidateColor);
-    }
-  }
-  
-  // Trim to exactly 12 colors if we have more
-  const finalColors = selectedColors.slice(0, 12);
-  
-  // Create color objects for each selected design system color
-  const colors: Color[] = [];
-  for (let i = 0; i < finalColors.length; i++) {
-    // Convert the hex to HSL to work with it
-    const hsl = chroma(finalColors[i]).hsl();
-    const hue = hsl[0] || 0; // Handle NaN for grayscale colors
-    const saturation = hsl[1] || 0.7;
-    const lightness = hsl[2] || 0.5;
-    
-    // Create a color object with light and dark mode variants
-    const color = createColorObject(
-      hue, 
-      saturation, 
-      lightness, 
-      i, 
-      lightBackground, 
-      darkBackground, 
-      strictnessLevel,
-      'categorical'
-    );
-    
-    colors.push(color);
-  }
+    };
+  });
   
   return colors;
 };

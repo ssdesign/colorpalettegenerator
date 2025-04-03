@@ -36,16 +36,19 @@ const HeatmapChart: React.FC<HeatmapChartProps> = ({ colorHexes, backgroundColor
     });
 
     // Set up dimensions
-    const margin = { top: 50, right: 30, bottom: 50, left: 50 };
-    const width = 460 - margin.left - margin.right;
-    const height = 460 - margin.top - margin.bottom;
+    const margin = { top: 30, right: 20, bottom: 35, left: 40 };
+    const containerWidth = 400;
+    const containerHeight = 250; // Reduced height to match Choropleth better
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
 
     // Clear previous content
     d3.select(svgRef.current).selectAll("*").remove();
 
     // Create SVG
     const svg = d3.select(svgRef.current)
-      .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+      .attr("viewBox", `0 0 ${containerWidth} ${containerHeight}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
       .attr("width", "100%")
       .attr("height", "100%")
       .append("g")
@@ -92,20 +95,20 @@ const HeatmapChart: React.FC<HeatmapChartProps> = ({ colorHexes, backgroundColor
       .style("stroke", isDarkMode ? "#444444" : "#DDDDDD")
       .style("stroke-width", 0.5); // Thinner borders for smaller cells
 
-    // Add title
+    // Add title with adjusted y-position
     svg.append("text")
       .attr("x", width / 2)
-      .attr("y", -margin.top / 2)
+      .attr("y", -margin.top / 2 + 5)
       .attr("text-anchor", "middle")
       .style("font-size", "16px")
       .style("fill", textColor)
       .text("Heatmap");
 
-    // Add legend
+    // Add legend with adjusted positioning
     const legendWidth = width * 0.8;
-    const legendHeight = 10;
+    const legendHeight = 8;
     const legendX = (width - legendWidth) / 2;
-    const legendY = height + margin.bottom - 10;
+    const legendY = height + 10; // Adjusted to be closer to the chart
 
     // Create gradient for legend
     const defs = svg.append("defs");
@@ -123,38 +126,69 @@ const HeatmapChart: React.FC<HeatmapChartProps> = ({ colorHexes, backgroundColor
         .attr("stop-color", color);
     });
 
+    // Create a group for the legend
+    const legendGroup = svg.append("g")
+      .attr("class", "legend-group")
+      .attr("transform", `translate(0, ${margin.bottom/2})`);
+
     // Add gradient rectangle
-    svg.append("rect")
+    legendGroup.append("rect")
       .attr("x", legendX)
       .attr("y", legendY)
       .attr("width", legendWidth)
       .attr("height", legendHeight)
-      .style("fill", "url(#legend-gradient)");
+      .style("fill", "url(#legend-gradient)")
+      .style("stroke", isDarkMode ? "#444444" : "#DDDDDD")
+      .style("stroke-width", 1);
 
-    // Add legend axis
+    // Add legend axis with more ticks and formatted numbers
     const legendScale = d3.scaleLinear()
       .domain([0, 10])
       .range([0, legendWidth]);
 
     const legendAxis = d3.axisBottom(legendScale)
-      .ticks(5);
+      .ticks(5) // Reduced ticks for better readability
+      .tickFormat(d => d3.format(".0f")(d)); // Removed decimal places for cleaner look
 
-    svg.append("g")
+    legendGroup.append("g")
+      .attr("class", "legend-axis")
       .attr("transform", `translate(${legendX}, ${legendY + legendHeight})`)
       .call(legendAxis)
       .selectAll("text")
-      .attr("fill", textColor);
+      .attr("fill", textColor)
+      .style("font-size", "12px"); // Increased font size
+
+    // Style the axis lines
+    legendGroup.select(".legend-axis")
+      .select(".domain")
+      .style("stroke", isDarkMode ? "#444444" : "#DDDDDD");
+
+    legendGroup.select(".legend-axis")
+      .selectAll(".tick line")
+      .style("stroke", isDarkMode ? "#444444" : "#DDDDDD");
+
+    // Add legend title
+    legendGroup.append("text")
+      .attr("x", legendX)
+      .attr("y", legendY - 8)
+      .attr("text-anchor", "start")
+      .attr("fill", textColor)
+      .style("font-size", "12px")
+      .text("Value");
 
   }, [colorHexes, backgroundColor, isDarkMode, textColor]);
 
   return (
-    <div className="w-full h-full" style={{ aspectRatio: '1/1' }}>
+    <div className="w-full h-full flex items-center justify-center">
       <svg
         ref={svgRef}
         style={{
           width: '100%',
           height: '100%',
-          display: 'block'
+          display: 'block',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          objectFit: 'contain'
         }}
       />
     </div>

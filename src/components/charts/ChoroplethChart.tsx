@@ -166,13 +166,16 @@ const ChoroplethChart: React.FC<ChoroplethChartProps> = ({ colorHexes, backgroun
   }, [colorHexes, backgroundColor, isDarkMode, textColor]);
 
   return (
-    <div className="w-full h-full" style={{ aspectRatio: '975/610' }}>
+    <div className="w-full h-full flex items-center justify-center">
       <svg 
         ref={svgRef}
         style={{
           width: '100%',
           height: '100%',
-          display: 'block'
+          display: 'block',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          objectFit: 'contain'
         }}
       />
     </div>

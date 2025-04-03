@@ -184,11 +184,11 @@ export const Layout: React.FC<LayoutProps> = ({
             <p className="text-sm">Check out more experiments on <a href="https://labs.crafxdesign.com" className="hover:underline">Crafx Labs</a></p>
           </div>
           <div className="flex gap-4 text-sm py-2">
-            <a href="#" className="hover:underline">Privacy</a>
+            <a href="https://labs.crafxdesign.com/privacy" className="hover:underline">Privacy</a>
             <span>|</span>
-            <a href="#" className="hover:underline">Terms</a>
+            <a href="https://labs.crafxdesign.com/terms" className="hover:underline">Terms</a>
             <span>|</span>
-            <a href="#" className="hover:underline">Contact</a>
+            <a href="mailto:contact@crafxdesign.com" className="hover:underline">Contact</a>
           </div>
         </div>
         <div 
