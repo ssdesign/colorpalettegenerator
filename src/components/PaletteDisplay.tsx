@@ -877,7 +877,7 @@ const PaletteDisplay: React.FC<PaletteDisplayProps> = ({
           <div className="flex gap-4">
             <div className="flex gap-2">
               <button
-                className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+                className={`px-3 py-1.5 text-[9px] font-medium rounded-md border transition-colors ${
                   strictnessLevel === 'AASmall' ? 'border-2' : ''
                 }`}
                 style={{
@@ -890,7 +890,7 @@ const PaletteDisplay: React.FC<PaletteDisplayProps> = ({
                 AA
               </button>
               <button
-                className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+                className={`px-3 py-1.5 text-[9px] font-medium rounded-md border transition-colors ${
                   strictnessLevel === 'AAASmall' ? 'border-2' : ''
                 }`}
                 style={{
