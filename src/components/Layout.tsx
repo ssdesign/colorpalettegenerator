@@ -181,7 +181,7 @@ export const Layout: React.FC<LayoutProps> = ({
       >
         <div className="max-w-[1920px] mx-auto w-full flex items-center px-24">
           <div className="flex-1 py-2">
-            <p className="text-sm">Check out more experiments on Crafx Labs website</p>
+            <p className="text-sm">Check out more experiments on <a href="https://labs.crafxdesign.com" className="hover:underline">Crafx Labs</a></p>
           </div>
           <div className="flex gap-4 text-sm py-2">
             <a href="#" className="hover:underline">Privacy</a>
