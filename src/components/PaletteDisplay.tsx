@@ -937,10 +937,19 @@ const PaletteDisplay: React.FC<PaletteDisplayProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={() => onRegeneratePalette(palette.id)}
-            className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="px-3 py-1 text-sm rounded-md transition-colors"
             style={{ 
-              borderColor,
-              color: textColor
+              backgroundColor: activeColor,
+              color: cardBackground,
+              border: 'none'
+            }}
+            onMouseEnter={(e) => {
+              // Darken the active color by 20%
+              const darkerColor = chroma(activeColor).darken(0.5).hex();
+              e.currentTarget.style.backgroundColor = darkerColor;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = activeColor;
             }}
             title="Regenerate this palette"
           >
